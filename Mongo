@@ -1,0 +1,79 @@
+// Consultas Básicas
+
+// a. Inserción de documentos
+db.autos.insertOne({
+  "marca": "Hyundai",
+  "modelo": "Accent",
+  "cilindraje": 1600,
+  "precio": 75000000,
+  "unidades": 5,
+  "sede": "Cali",
+  "tipo_auto": "Sedan",
+  "color": "Gris",
+  "combustible": "Gasolina",
+  "transmision": "Automática",
+  "año": 2023
+});
+
+// b. Selección de documentos
+// Todos los documentos
+db.autos.find();
+
+// Selección con proyección (mostrar solo marca, modelo, y precio)
+db.autos.find({}, { "marca": 1, "modelo": 1, "precio": 1, "_id": 0 });
+
+// c. Actualización de documentos
+// Actualizar el precio de un auto específico
+db.autos.updateOne(
+  { "modelo": "Corolla" },
+  { $set: { "precio": 87000000 } }
+);
+
+// Incrementar las unidades de todos los autos en 2
+db.autos.updateMany({}, { $inc: { "unidades": 2 } });
+
+// d. Eliminación de documentos
+// Eliminar un auto específico
+db.autos.deleteOne({ "modelo": "Mustang" });
+
+// Eliminar todos los autos de una sede
+db.autos.deleteMany({ "sede": "Cali" });
+
+// Consultas con Filtros y Operadores
+
+// a. Filtrar autos por rango de precios
+db.autos.find({ "precio": { $gte: 50000000, $lte: 100000000 } });
+
+// b. Autos de tipo SUV y color rojo
+db.autos.find({ "tipo_auto": "SUV", "color": "Rojo" });
+
+// c. Autos fabricados después de 2022 con transmisión automática
+db.autos.find({ "año": { $gt: 2022 }, "transmision": "Automática" });
+
+// d. Autos con más de 10 unidades disponibles
+db.autos.find({ "unidades": { $gt: 10 } });
+
+// Consultas de Agregación
+
+// a. Contar la cantidad total de autos en la colección
+db.autos.countDocuments();
+
+// b. Sumar las unidades disponibles de todos los autos
+db.autos.aggregate([
+  { $group: { _id: null, totalUnidades: { $sum: "$unidades" } } }
+]);
+
+// c. Calcular el precio promedio de los autos por sede
+db.autos.aggregate([
+  { $group: { _id: "$sede", precioPromedio: { $avg: "$precio" } } }
+]);
+
+// d. Cantidad de autos por tipo
+db.autos.aggregate([
+  { $group: { _id: "$tipo_auto", cantidad: { $sum: 1 } } }
+]);
+
+// e. Autos más caros por sede
+db.autos.aggregate([
+  { $group: { _id: "$sede", autoMasCaro: { $max: "$precio" } } }
+]);
